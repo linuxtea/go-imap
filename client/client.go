@@ -11,8 +11,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/emersion/go-imap"
-	"github.com/emersion/go-imap/responses"
+	"github.com/linuxtea/go-imap"
+	"github.com/linuxtea/go-imap/responses"
 )
 
 // errClosed is used when a connection is closed while waiting for a command
@@ -530,7 +530,7 @@ func Dial(addr string) (c *Client, err error) {
 // using dialer.Dial.
 //
 // Among other uses, this allows to apply a dial timeout.
-func DialWithDialer(dialer *net.Dialer, address string) (c *Client, err error) {
+func DialWithDialer(timedeadline int64, dialer *net.Dialer, address string) (c *Client, err error) {
 	conn, err := dialer.Dial("tcp", address)
 	if err != nil {
 		return nil, err
@@ -540,13 +540,22 @@ func DialWithDialer(dialer *net.Dialer, address string) (c *Client, err error) {
 	// there is no way to set the client's Timeout for that action. As a
 	// workaround, if the dialer has a timeout set, use that for the connection's
 	// deadline.
-	if dialer.Timeout > 0 {
-		err = conn.SetDeadline(time.Now().Add(dialer.Timeout))
-		if err != nil {
-			return
-		}
+	err = conn.SetDeadline(time.Now().Add(time.Duration(timedeadline) * time.Second))
+	if err != nil {
+		return
 	}
-
+	// if !dialer.Deadline.IsZero() {
+	// 	err = conn.SetDeadline(dialer.Deadline)
+	// 	if err != nil {
+	// 		return
+	// 	}
+	// }
+	// if dialer.Timeout > 0 {
+	// 	err = conn.SetReadDeadline(time.Now().Add(dialer.Timeout))
+	// 	if err != nil {
+	// 		return
+	// 	}
+	// }
 	c, err = New(conn)
 	return
 }
@@ -567,7 +576,7 @@ func DialTLS(addr string, tlsConfig *tls.Config) (c *Client, err error) {
 // using dialer.Dial.
 //
 // Among other uses, this allows to apply a dial timeout.
-func DialWithDialerTLS(dialer *net.Dialer, addr string,
+func DialWithDialerTLS(timedeadline int64, dialer *net.Dialer, addr string,
 	tlsConfig *tls.Config) (c *Client, err error) {
 	conn, err := tls.DialWithDialer(dialer, "tcp", addr, tlsConfig)
 	if err != nil {
@@ -578,13 +587,22 @@ func DialWithDialerTLS(dialer *net.Dialer, addr string,
 	// there is no way to set the client's Timeout for that action. As a
 	// workaround, if the dialer has a timeout set, use that for the connection's
 	// deadline.
-	if dialer.Timeout > 0 {
-		err = conn.SetDeadline(time.Now().Add(dialer.Timeout))
-		if err != nil {
-			return
-		}
+	err = conn.SetDeadline(time.Now().Add(time.Duration(timedeadline) * time.Second))
+	if err != nil {
+		return
 	}
-
+	// if !dialer.Deadline.IsZero() {
+	// 	err = conn.SetDeadline(dialer.Deadline)
+	// 	if err != nil {
+	// 		return
+	// 	}
+	// }
+	// if dialer.Timeout > 0 {
+	// 	err = conn.SetReadDeadline(time.Now().Add(dialer.Timeout))
+	// 	if err != nil {
+	// 		return
+	// 	}
+	// }
 	c, err = New(conn)
 	c.isTLS = true
 	return

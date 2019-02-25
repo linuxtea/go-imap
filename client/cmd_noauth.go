@@ -5,10 +5,10 @@ import (
 	"errors"
 	"net"
 
-	"github.com/emersion/go-imap"
-	"github.com/emersion/go-imap/commands"
-	"github.com/emersion/go-imap/responses"
-	"github.com/emersion/go-sasl"
+	"github.com/linuxtea/go-imap"
+	"github.com/linuxtea/go-imap/commands"
+	"github.com/linuxtea/go-imap/responses"
+	"github.com/linuxtea/go-sasl"
 )
 
 var (
